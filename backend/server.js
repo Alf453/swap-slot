@@ -16,9 +16,16 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+
+// ✅ Added both localhost and deployed Vercel URL here
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://swap-slot.vercel.app",
+];
+
 const io = new IOServer(server, {
   cors: {
-    origin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
@@ -49,12 +56,15 @@ io.on("connection", (socket) => {
 app.set("io", io);
 
 app.use(helmet());
+
+// ✅ Allow both localhost & Vercel frontend
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
+    origin: allowedOrigins,
     credentials: true,
   })
 );
+
 app.use(express.json());
 app.use(morgan("dev"));
 

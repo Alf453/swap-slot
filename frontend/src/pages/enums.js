@@ -1,0 +1,5 @@
+export const EVENT_STATUS = {
+  BUSY: "BUSY",
+  SWAPPABLE: "SWAPPABLE",
+  SWAP_PENDING: "SWAP_PENDING",
+};

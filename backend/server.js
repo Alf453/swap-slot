@@ -17,13 +17,35 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// ✅ Allow both localhost and deployed Vercel frontend
+// ✅ Allowed Origins
 const allowedOrigins = [
   "http://localhost:5173",
   "https://swap-slot.vercel.app",
 ];
 
-// Socket.io CORS config
+// ✅ CORS Middleware (FIRST!)
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
+// ✅ Handle all OPTIONS preflight requests globally
+app.options("*", cors());
+
+// ✅ Now safe to add other middlewares
+app.use(helmet());
+app.use(express.json());
+app.use(morgan("dev"));
+
+// ✅ Socket.io setup
 const io = new IOServer(server, {
   cors: {
     origin: allowedOrigins,
@@ -32,7 +54,6 @@ const io = new IOServer(server, {
   },
 });
 
-// Secure socket with JWT from query.token
 io.use((socket, next) => {
   try {
     const { token } = socket.handshake.query;
@@ -56,27 +77,12 @@ io.on("connection", (socket) => {
 
 app.set("io", io);
 
-app.use(helmet());
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
-app.use(express.json());
-app.use(morgan("dev"));
-
+// ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/swaps", swapRoutes);
 
-app.get("/", (_, res) => res.send("SlotSwapper API running"));
+app.get("/", (_, res) => res.send("SlotSwapper API running ✅"));
 
 const PORT = process.env.PORT || 5000;
 

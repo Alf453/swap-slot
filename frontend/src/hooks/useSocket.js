@@ -8,7 +8,7 @@ export default function useSocket() {
 
   useEffect(() => {
     if (!token) return;
-    const s = io("http://localhost:5000", { query: { token } });
+    const s = io("https://swap-slot.onrender.com", { query: { token } });
 
     s.on("socket:connected", () => {});
     s.on("swap:incoming", () => {

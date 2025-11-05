@@ -38,7 +38,7 @@ app.use(
 );
 
 // ✅ Handle all OPTIONS preflight requests globally
-app.options("/*", cors());
+app.options("/(.*)", cors());
 
 // ✅ Now safe to add other middlewares
 app.use(helmet());

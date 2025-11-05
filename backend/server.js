@@ -16,9 +16,17 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+
+// ✅ Allow both localhost and deployed Vercel frontend
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://swap-slot.vercel.app",
+];
+
+// Socket.io CORS config
 const io = new IOServer(server, {
   cors: {
-    origin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
@@ -51,7 +59,13 @@ app.set("io", io);
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
@@ -61,6 +75,7 @@ app.use(morgan("dev"));
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/swaps", swapRoutes);
+
 app.get("/", (_, res) => res.send("SlotSwapper API running"));
 
 const PORT = process.env.PORT || 5000;

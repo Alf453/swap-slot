@@ -20,7 +20,6 @@ const footerStyle = {
   marginTop: 40,
   padding: "12px 0",
   fontSize: "0.9rem",
-  color: "#555",
   borderTop: "1px solid #e5e7eb",
   background: "linear-gradient(90deg, #3b82f6, #06b6d4)",
   color: "white",

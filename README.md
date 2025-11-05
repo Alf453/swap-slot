@@ -1,6 +1,3 @@
-Here’s a concise, paragraph-style **README summary** — focused only on what’s essential for your project review: what it is, how to run it, your endpoints, and main decisions/challenges.
-
----
 
 # SlotSwapper
 
